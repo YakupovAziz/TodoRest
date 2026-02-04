@@ -20,13 +20,11 @@ public class TodoController {
         return ResponseEntity.ok(todoService.addTodo(todoDto));
     }
 
-
     @GetMapping
     public ResponseEntity<List<TodoDto>> listTodo() {
         List<TodoDto> todos = todoService.getAllTodos();
         return ResponseEntity.ok(todos);
     }
-
 
     @GetMapping("{id}")
     public ResponseEntity<TodoDto> getTodo(@PathVariable Long id) {
