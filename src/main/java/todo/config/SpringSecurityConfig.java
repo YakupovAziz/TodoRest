@@ -1,10 +1,13 @@
 package todo.config;
 
 
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -17,7 +20,11 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
+@AllArgsConstructor
 public class SpringSecurityConfig {
+
+
+    private UserDetailsService userDetailsService;
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -50,25 +57,30 @@ public class SpringSecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(PasswordEncoder encoder){
-
-        UserDetails ramesh = User.builder()
-                .username("ramesh")
-                .password(encoder.encode("password"))
-                .roles("USER")
-                .build();
-
-        UserDetails admin = User.builder()
-                .username("admin")
-                .password(encoder.encode("admin1984"))
-                .roles("ADMIN")
-                .build();
-
-        UserDetails usermar = User.withUsername("marina")
-                .password(encoder.encode("mar123"))
-                .roles("USER")
-                .build();
-
-        return new InMemoryUserDetailsManager(ramesh,admin, usermar);
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
     }
+
+//    @Bean
+//    public UserDetailsService userDetailsService(PasswordEncoder encoder){
+//
+//        UserDetails ramesh = User.builder()
+//                .username("ramesh")
+//                .password(encoder.encode("password"))
+//                .roles("USER")
+//                .build();
+//
+//        UserDetails admin = User.builder()
+//                .username("admin")
+//                .password(encoder.encode("admin1984"))
+//                .roles("ADMIN")
+//                .build();
+//
+//        UserDetails usermar = User.withUsername("marina")
+//                .password(encoder.encode("mar123"))
+//                .roles("USER")
+//                .build();
+//
+//        return new InMemoryUserDetailsManager(ramesh,admin, usermar);
+//    }
 }
