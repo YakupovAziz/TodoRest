@@ -41,10 +41,9 @@ public class SpringSecurityConfig {
                         sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                     .authorizeHttpRequests(auth -> auth
-//                            .requestMatchers(
-//                                    "/admin/**",
-//                                    "/admin/auth/**",
-//                                    "/actuator/health").permitAll()
+                            .requestMatchers(
+                                    "/api/auth/**",
+                                    "/actuator/health").permitAll()
                             //.requestMatchers("/api/todos/**").hasRole("USER")
                             .requestMatchers(HttpMethod.POST,"/api/todos/**").hasRole("ADMIN")
                             .requestMatchers(HttpMethod.PUT,"/api/todos/**").hasRole("ADMIN")
