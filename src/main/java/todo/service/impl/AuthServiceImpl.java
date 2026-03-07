@@ -15,6 +15,7 @@ import todo.entity.User;
 import todo.exception.TodoAPIException;
 import todo.repository.RoleRepository;
 import todo.repository.UserRepository;
+import todo.security.JwtTokenProvider;
 import todo.service.AuthService;
 
 import java.util.HashSet;
@@ -24,6 +25,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
+    private JwtTokenProvider jwtTokenProvider;
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
@@ -51,9 +53,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
         roles.add(userRole);
-
         user.setRoles(roles);
-
         userRepository.save(user);
 
         return "User registered successfully";
@@ -61,14 +61,13 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String login(LoginDto loginDto) {
-
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginDto.getUsernameOrEmail(), loginDto.getPassword()
         ));
-
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
+        String token = jwtTokenProvider.generateToken(authentication);
 
-        return "User logged in successfully";
+        return token;
     }
 }

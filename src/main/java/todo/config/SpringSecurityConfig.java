@@ -1,6 +1,5 @@
 package todo.config;
 
-
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,23 +7,28 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import todo.security.JwtAuthenticationFilter;
+import todo.security.*;
+
 
 @Configuration
 @AllArgsConstructor
+@EnableMethodSecurity
 public class SpringSecurityConfig {
 
 
     private UserDetailsService userDetailsService;
+    private JwtAuthenticationFilter authenticationFilter;
+    private JwtAuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -52,6 +56,13 @@ public class SpringSecurityConfig {
                             .requestMatchers(HttpMethod.PATCH,"/api/todos/**").hasAnyRole("USER", "ADMIN")
                             .anyRequest().authenticated()
                 ).httpBasic(Customizer.withDefaults());
+
+        http.exceptionHandling(
+                exceptionHandling ->
+                        exceptionHandling.authenticationEntryPoint(authenticationEntryPoint));
+        http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+
         return http.build();
     }
 
